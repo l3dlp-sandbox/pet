@@ -11,14 +11,14 @@ import (
 )
 
 type Snippets struct {
-	Snippets []SnippetInfo `toml:"snippets"`
+	Snippets []SnippetInfo
 }
 
 type SnippetInfo struct {
-	Description string   `toml:"description"`
-	Command     string   `toml:"command" multiline:"true"`
-	Tag         []string `toml:"tag"`
-	Output      string   `toml:"output"`
+	Description string
+	Command     string `toml:"command,multiline"`
+	Tag         []string
+	Output      string
 }
 
 // Load reads toml file.
@@ -31,7 +31,12 @@ func (snippets *Snippets) Load() error {
 	if err != nil {
 		return fmt.Errorf("failed to load snippet file. %v", err)
 	}
-	toml.Unmarshal(f, snippets)
+
+	err = toml.Unmarshal(f, snippets)
+	if err != nil {
+		return fmt.Errorf("failed to parse snippet file. %v", err)
+	}
+
 	snippets.Order()
 	return nil
 }
