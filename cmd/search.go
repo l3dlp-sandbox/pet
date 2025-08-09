@@ -25,7 +25,7 @@ func search(cmd *cobra.Command, args []string) (err error) {
 	if flag.Query != "" {
 		options = append(options, fmt.Sprintf("--query %s", shellescape.Quote(flag.Query)))
 	}
-	commands, err := filter(options, flag.FilterTag)
+	commands, err := filter(options, flag.FilterTag, flag.Raw)
 	if err != nil {
 		return err
 	}
@@ -39,6 +39,8 @@ func search(cmd *cobra.Command, args []string) (err error) {
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
+	searchCmd.Flags().BoolVarP(&config.Flag.Raw, "raw", "", false,
+		`Output raw command without entering parameter dialog`)
 	searchCmd.Flags().BoolVarP(&config.Flag.Color, "color", "", false,
 		`Enable colorized output (only fzf)`)
 	searchCmd.Flags().StringVarP(&config.Flag.Query, "query", "q", "",

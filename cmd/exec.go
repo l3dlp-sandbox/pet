@@ -27,7 +27,7 @@ func _execute(in io.ReadCloser, out io.Writer) (err error) {
 		options = append(options, fmt.Sprintf("--query %s", shellescape.Quote(flag.Query)))
 	}
 
-	commands, err := filter(options, flag.FilterTag)
+	commands, err := filter(options, flag.FilterTag, false)
 	if err != nil {
 		return err
 	}

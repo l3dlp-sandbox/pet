@@ -26,7 +26,7 @@ func clip(cmd *cobra.Command, args []string) (err error) {
 		options = append(options, fmt.Sprintf("--query %s", flag.Query))
 	}
 
-	commands, err := filter(options, flag.FilterTag)
+	commands, err := filter(options, flag.FilterTag, flag.Raw)
 	if err != nil {
 		return err
 	}
@@ -39,6 +39,8 @@ func clip(cmd *cobra.Command, args []string) (err error) {
 
 func init() {
 	RootCmd.AddCommand(clipCmd)
+	clipCmd.Flags().BoolVarP(&config.Flag.Raw, "raw", "", false,
+		`Output raw command without entering parameter dialog`)
 	clipCmd.Flags().StringVarP(&config.Flag.Query, "query", "q", "",
 		`Initial value for query`)
 	clipCmd.Flags().BoolVarP(&config.Flag.Command, "command", "", false,

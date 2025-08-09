@@ -176,6 +176,65 @@ https://github.com/otms61/fish-pet
 <img src="doc/pet03.gif" width="700">
 
 
+## Expand snippet parameters inline on shell
+
+You can expand parameters using the shell instead of the builtin TUI dialog. This allows you to edit the parameters with native shell features, like tab-completion, highlighting, etc.
+
+### bash
+
+```bash
+function pet-select() {
+  BUFFER=$(pet search --raw --query "$READLINE_LINE")
+  READLINE_LINE=$BUFFER
+  READLINE_POINT=${#BUFFER}
+}
+bind -x '"\C-x\C-r": pet-select'
+
+function _pet_move_cursor_to_next_parameter() {
+  match="$(echo "$READLINE_LINE" | perl -nle 'print $& if /<.*?>/')"
+  if [ ! -z "$match" ]; then
+    default="$(echo "$match" | perl -nle 'print $& if /(?<==).*(?=>)/')"
+    match_len=${#match}
+    default_len=${#default}
+
+    pre_match=${READLINE_LINE%%$match*}
+    parameter_offset=${#pre_match}
+
+    READLINE_POINT="$((${parameter_offset} + ${default_len}))"
+    READLINE_LINE="${READLINE_LINE:0:$parameter_offset}${default}${READLINE_LINE:$parameter_offset+$match_len}"
+  fi        
+}
+bind -x '"\C-n": _pet_move_cursor_to_next_parameter'
+```
+
+### zsh
+
+```zsh
+function pet-select() {
+  BUFFER=$(pet search --raw --query "$LBUFFER")
+  CURSOR=$#BUFFER
+  zle redisplay
+}
+zle -N pet-select
+stty -ixon
+bindkey '^s' pet-select
+
+function _pet_move_cursor_to_next_parameter() {
+    match="$(echo "$BUFFER" | perl -nle 'print $& if /<.*?>/')"
+    if [ ! -z "$match" ]; then
+      default="$(echo "$match" | perl -nle 'print $& if /(?<==).*(?=>)/')"
+      match_len=${#match}
+      default_len=${#default}
+      parameter_offset=${#BUFFER%%$match*}
+
+      CURSOR="$((${parameter_offset} + ${default_len}))"
+      BUFFER="${BUFFER[1,$parameter_offset]}${default}${BUFFER[$parameter_offset+$match_len+1,-1]}"
+    fi        
+}
+zle -N _pet_move_cursor_to_next_parameter
+bindkey '^n' _pet_move_cursor_to_next_parameter 
+```
+
 ## Copy snippets to clipboard
 By using `pbcopy` on macOS, you can copy snippets to clipboard.
 
