@@ -14,7 +14,7 @@ import (
 	"github.com/knqyf263/pet/snippet"
 )
 
-func filter(options []string, tag string) (commands []string, err error) {
+func filter(options []string, tag string, raw bool) (commands []string, err error) {
 	var snippets snippet.Snippets
 	if err := snippets.Load(true); err != nil {
 		return commands, fmt.Errorf("load snippet failed: %v", err)
@@ -76,7 +76,7 @@ func filter(options []string, tag string) (commands []string, err error) {
 	var params [][2]string
 
 	// If only one line is selected, search for params in the command
-	if len(lines) == 1 {
+	if len(lines) == 1 && !raw {
 		snippetInfo := snippetTexts[lines[0]]
 		params = dialog.SearchForParams(snippetInfo.Command)
 	} else {
