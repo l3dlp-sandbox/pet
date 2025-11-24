@@ -192,7 +192,7 @@ bind -x '"\C-x\C-r": pet-select'
 
 function _pet_move_cursor_to_next_parameter() {
   match="$(echo "$READLINE_LINE" | perl -nle 'print $& if /<.*?>/')"
-  if [ ! -z "$match" ]; then
+  if [ -n "$match" ]; then
     default="$(echo "$match" | perl -nle 'print $& if /(?<==).*(?=>)/')"
     match_len=${#match}
     default_len=${#default}
